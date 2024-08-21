@@ -6,15 +6,38 @@ from time import sleep
 import requests
 import os
 from dotenv import load_dotenv
+from gpiozero import Button
+
+from button_checker import ButtonChecker
+from printer import Printer
 
 
 class TicketDispenser():
     def __init__(self) -> None:
+        # get env
+        load_dotenv()
         self.web_address = os.getenv('WEBAPP_ADDRESS')
         self.web_port = os.getenv('WEBAPP_PORT')
         self.web_hook = os.getenv('WEBAPP_HOOK')
+        self.vendor_id = os.getenv('VENDOR_ID')
+        self.product_id = os.getenv('PRODUCT_ID')
+        self.button_pin_1 = os.getenv('BUTTON_PIN_1')
+        self.button_pin_2 = os.getenv('BUTTON_PIN_2')
+
         self.url = f'http://{self.web_address}:{self.web_port}/{self.web_hook}'
         self.ip = self.get_current_ip()
+
+        # define button
+        self.button1 = ButtonChecker(self.button_pin_1)
+        self.button2 = ButtonChecker(self.button_pin_2)
+
+        # define printer
+        self.printer = Printer(vendor_id=self.vendor_id,
+                               product_id=self.product_id)
+
+        # define the vehicle
+        self.vehicle_code_1 = os.getenv('VEHICLE_CODE_1')
+        self.vehicle_code_2 = os.getenv('VEHICLE_CODE_2')
 
     def send_event_to_webapp(self, data) -> None:
         response = requests.post(self.url, json=data)
@@ -36,10 +59,9 @@ class TicketDispenser():
             s.close()
         return ip
 
-    def prepare_payload(self) -> dict:
-        now = datetime.now()
-        created_at = now.strftime('%Y-%m-%d %H:%M')
-        transaction_id = self.generate_random_string()
+    def prepare_payload(self, random_transaction_id, vehicle_code, created_time) -> dict:
+        created_at = created_time.strftime('%Y-%m-%d %H:%M')
+        transaction_id = random_transaction_id
         local_port = os.getenv("LOCAL_PORT")
         ip_address = self.ip
 
@@ -49,20 +71,36 @@ class TicketDispenser():
             "transaction_id": transaction_id,
             "location_id": os.getenv('LOCATION_ID'),
             "image_path": image_path,
-            "vehicle_code": os.getenv('VEHICLE_CODE_1'),
+            "vehicle_code": vehicle_code,
             "created_at": created_at,
         }
         return data
 
     def execute(self):
+        vehicle_code = self.vehicle_code_1
+        if self.button1.is_pressed():
+            vehicle_code = self.vehicle_code_1
+        elif self.button2.is_pressed():
+            vehicle_code = self.vehicle_code_2
+        else:
+            # Nothing was pressed
+            return
+
+        # generate transaction id
+        transaction_id = self.generate_random_string()
+        # create string date time
+        now = datetime.now()
+        created_time = now.strftime('%Y-%m-%d %H:%M:%S')
+
+        self.printer.print_ticket(transaction_id=transaction_id, vehicle_code=vehicle_code, created_time=created_time)
+
         # Send data to webapp
-        data = self.prepare_payload()
+        data = self.prepare_payload(
+            randm_transaction_id=transaction_id, vehicle_code=vehicle_code, created_time=now)
         self.send_event_to_webapp(data=data)
 
 
 if __name__ == "__main__":
-    # get env
-    load_dotenv()
     dispenser = TicketDispenser()
     while True:
         dispenser.execute()
