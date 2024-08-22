@@ -104,4 +104,4 @@ if __name__ == "__main__":
     dispenser = TicketDispenser()
     while True:
         dispenser.execute()
-        sleep(.3)
+        sleep(3)
