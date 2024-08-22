@@ -12,3 +12,4 @@ class Printer():
         p.qr(transaction_id, size=6, native=True)
         p.text(f"{created_time} | {vehicle_code}")
         p.cut()
+        p.close()
