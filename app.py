@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from gpiozero import Button
 
 from button_checker import ButtonChecker
+from camera import Camera
 from printer import Printer
 
 
@@ -34,6 +35,9 @@ class TicketDispenser():
         # define printer
         self.printer = Printer(vendor_id=self.vendor_id,
                                product_id=self.product_id)
+
+        # define camera
+        self.camera = Camera()
 
         # define the vehicle
         self.vehicle_code_1 = os.getenv('VEHICLE_CODE_1')
@@ -92,7 +96,14 @@ class TicketDispenser():
         now = datetime.now()
         created_time = now.strftime('%Y-%m-%d %H:%M:%S')
 
-        self.printer.print_ticket(transaction_id=transaction_id, vehicle_code=vehicle_code, created_time=created_time)
+        try:
+            # Print ticket
+            self.printer.print_ticket(transaction_id=transaction_id, vehicle_code=vehicle_code, created_time=created_time)
+        except Exception as e:
+            print(f"Failed to print, transaction invalid: {e}")
+            return
+        # Capture image
+        self.camera.capture(transaction_id=transaction_id)
 
         # Send data to webapp
         data = self.prepare_payload(
