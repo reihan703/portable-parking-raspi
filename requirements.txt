@@ -3,7 +3,7 @@ argcomplete==3.5.0
 certifi==2024.7.4
 charset-normalizer==3.3.2
 colorzero==2.0
-escpos==2.0.0
+escpos==1.9
 future==1.0.0
 gpiozero==2.0.1
 idna==3.7
