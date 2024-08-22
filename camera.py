@@ -27,7 +27,7 @@ class Camera():
         if ret:
             # Save the captured image to a file
             cv2.imwrite(f'public/images/{transaction_id}.jpg', frame)
-            print("Image captured and saved as 'ip_camera_image.jpg'")
+            print(f"Image captured and saved on images")
 
         else:
             print("Failed to capture image")
