@@ -21,8 +21,8 @@ class TicketDispenser():
         self.web_hook = os.getenv('WEBAPP_HOOK')
         self.vendor_id = os.getenv('VENDOR_ID')
         self.product_id = os.getenv('PRODUCT_ID')
-        self.button_pin_1 = os.getenv('BUTTON_PIN_1')
-        self.button_pin_2 = os.getenv('BUTTON_PIN_2')
+        self.button_pin_1 = int(os.getenv('BUTTON_PIN_1'))
+        self.button_pin_2 = int(os.getenv('BUTTON_PIN_2'))
 
         self.url = f'http://{self.web_address}:{self.web_port}/{self.web_hook}'
         self.ip = self.get_current_ip()
