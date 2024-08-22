@@ -69,7 +69,7 @@ class TicketDispenser():
         local_port = os.getenv("LOCAL_PORT")
         ip_address = self.ip
 
-        image_path = f"http://{ip_address}:{local_port}/images/{transaction_id}.jpeg"
+        image_path = f"http://{ip_address}:{local_port}/images/{transaction_id}.jpg"
         data = {
             "event": "create_transaction",
             "transaction_id": transaction_id,
