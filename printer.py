@@ -8,7 +8,7 @@ class Printer():
 
     def print_ticket(self, transaction_id, vehicle_code, created_time):
         p = printer.Usb(self.vendor_id, self.product_id)
-        printer.set(align='center', flip=True)
-        printer.qr(transaction_id, size=6, native=True)
-        printer.text(f"{created_time} | {vehicle_code}")
-        printer.cut()
+        p.set(align='center', flip=True)
+        p.qr(transaction_id, size=6, native=True)
+        p.text(f"{created_time} | {vehicle_code}")
+        p.cut()

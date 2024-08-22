@@ -96,7 +96,7 @@ class TicketDispenser():
 
         # Send data to webapp
         data = self.prepare_payload(
-            randm_transaction_id=transaction_id, vehicle_code=vehicle_code, created_time=now)
+            random_transaction_id=transaction_id, vehicle_code=vehicle_code, created_time=now)
         self.send_event_to_webapp(data=data)
 
 
